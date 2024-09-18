@@ -15,26 +15,44 @@ func TestRandomKey(t *testing.T) {
 		expected    []interface{}
 	}{
 		{
+			description: "invalid argument count",
+			commands: []string{
+				"RANDOMKEY abc",
+				"RANDOMKEY abc def",
+			},
+			expected: []interface{}{
+				"ERR wrong number of arguments for 'randomkey' command",
+				"ERR wrong number of arguments for 'randomkey' command",
+			},
+		},
+		{
 			description: "no key returns (nil)",
 			commands: []string{
+				"FLUSHDB",
 				"RANDOMKEY",
 			},
-			expected: []interface{}{"(nil)"},
+			expected: []interface{}{
+				"OK",
+				"(nil)",
+			},
 		},
 		{
 			description: "single defined key returns only that key",
 			commands: []string{
+				"FLUSHDB",
 				"SET name abc",
 				"RANDOMKEY",
 			},
 			expected: []interface{}{
 				"OK",
-				"\"name\"",
+				"OK",
+				"name",
 			},
 		},
 		{
 			description: "multiple defined keys return a random key from the defined key list",
 			commands: []string{
+				"FLUSHDB",
 				"SET name abc",
 				"SET value def",
 				"SET name2 ghi",
@@ -48,9 +66,10 @@ func TestRandomKey(t *testing.T) {
 				"OK",
 				"OK",
 				"OK",
-				[]interface{}{"\"name\"", "\"value\"", "\"name2\"", "\"value-35\""},
-				[]interface{}{"\"name\"", "\"value\"", "\"name2\"", "\"value-35\""},
-				[]interface{}{"\"name\"", "\"value\"", "\"name2\"", "\"value-35\""},
+				"OK",
+				[]interface{}{"name", "value", "name2", "value-35"},
+				[]interface{}{"name", "value", "name2", "value-35"},
+				[]interface{}{"name", "value", "name2", "value-35"},
 			},
 		},
 	}

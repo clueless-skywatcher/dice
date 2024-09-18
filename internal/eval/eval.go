@@ -3556,6 +3556,10 @@ func evalJSONNUMINCRBY(args []string, store *dstore.Store) []byte {
 }
 
 func evalRANDOMKEY(args []string, store *dstore.Store) []byte {
+	if len(args) != 0 {
+		return diceerrors.NewErrArity("RANDOMKEY")
+	}
+
 	keys, err := store.Keys("*")
 	if err != nil {
 		return diceerrors.NewErrWithMessage(err.Error())

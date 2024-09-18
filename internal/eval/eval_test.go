@@ -75,6 +75,7 @@ func TestEval(t *testing.T) {
 	testEvalGETEX(t, store)
 	testEvalJSONNUMINCRBY(t, store)
 	testEvalCOMMAND(t, store)
+	testEvalRANDOMKEY(t, store)
 }
 
 func testEvalPING(t *testing.T, store *dstore.Store) {
@@ -2586,6 +2587,59 @@ func testEvalCOMMAND(t *testing.T, store *dstore.Store) {
 
 	runEvalTests(t, tests, evalCommand, store)
 }
+
+func testEvalRANDOMKEY(t *testing.T, store *dstore.Store) {
+	tests := map[string]evalTestCase{
+		"RANDOMKEY invalid argument count": {
+			setup: func() {},
+			input: []string{
+				"abc",
+			},
+			output: []byte(
+				"-ERR wrong number of arguments for 'randomkey' command\r\n",
+			),
+		},
+		"RANDOMKEY without setting data": {
+			setup: func() {
+				store.GetStore().Clear()
+			},
+			input:  []string{},
+			output: clientio.RespNIL,
+		},
+		"RANDOMKEY after setting one key": {
+			setup: func() {
+				store.GetStore().Clear()
+				obj := &object.Obj{
+					Value:          5,
+					LastAccessedAt: uint32(time.Now().Unix()),
+				}
+				store.Put("name", obj)
+			},
+			input:  []string{},
+			output: clientio.Encode("name", false),
+		},
+	}
+
+	runEvalTests(t, tests, evalRANDOMKEY, store)
+}
+
+func BenchmarkEvalRANDOMKEY(b *testing.B) {
+	store := dstore.NewStore(nil)
+	for i := 0; i < b.N; i++ {
+		store.Put(fmt.Sprintf("key%d", i), store.NewObj(
+				[]byte(strconv.Itoa(i)),
+				-1,
+				object.ObjTypeString,
+				object.ObjEncodingRaw,
+			),
+		)
+	}
+
+	for i := 0; i < b.N; i++ {
+		evalRANDOMKEY([]string{}, store)
+	}
+}
+
 func TestMSETConsistency(t *testing.T) {
 	store := dstore.NewStore(nil)
 	evalMSET([]string{"KEY", "VAL", "KEY2", "VAL2"}, store)
