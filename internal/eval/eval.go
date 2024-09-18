@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"math/rand"
 	"regexp"
 	"sort"
 	"strconv"
@@ -3552,4 +3553,15 @@ func evalJSONNUMINCRBY(args []string, store *dstore.Store) []byte {
 
 	obj.Value = jsonData
 	return clientio.Encode(resultString, false)
+}
+
+func evalRANDOMKEY(args []string, store *dstore.Store) []byte {
+	keys, err := store.Keys("*")
+	if err != nil {
+		return diceerrors.NewErrWithMessage(err.Error())
+	}
+	if len(keys) == 0 {
+		return clientio.RespNIL
+	}
+	return clientio.Encode(keys[rand.Intn(len(keys))], false)
 }

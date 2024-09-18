@@ -761,6 +761,12 @@ var (
 		Arity:    3,
 		KeySpecs: KeySpecs{BeginIndex: 1},
 	}
+	randomkeyCmdMeta = DiceCmdMeta {
+		Name:		"RANDOMKEY",
+		Info: 		`Return a random key from the currently selected database.`,
+		Eval:		evalRANDOMKEY,
+		Arity: 		0,
+	}
 )
 
 func init() {
@@ -850,6 +856,7 @@ func init() {
 	DiceCmds["HLEN"] = hlenCmdMeta
 	DiceCmds["SELECT"] = selectCmdMeta
 	DiceCmds["JSON.NUMINCRBY"] = jsonnumincrbyCmdMeta
+	DiceCmds["RANDOMKEY"] = randomkeyCmdMeta
 }
 
 // Function to convert DiceCmdMeta to []interface{}

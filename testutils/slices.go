@@ -62,3 +62,14 @@ func EqualInt64Slice(a, b []int64) bool {
 
 	return true
 }
+
+// OneOf: Check whether parameter a belongs to the list of objects b
+func OneOf(a interface{}, b []interface{}) bool {
+	for i := 0; i < len(b); i++ {
+		if a == b[i] {
+			return true
+		}
+	}
+
+	return false
+}
